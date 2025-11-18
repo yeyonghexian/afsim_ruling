@@ -1,4 +1,4 @@
-#include "rulemodelmanagerdialog.h"
+﻿#include "rulemodelmanagerdialog.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -16,7 +16,7 @@
 RuleModelManagerDialog::RuleModelManagerDialog(QWidget *parent)
     : QDialog(parent)
 {
-    setWindowTitle(tr("规则与模型管理"));
+    setWindowTitle(QStringLiteral("规则与模型管理"));
     resize(800, 500);
 
     auto *layout = new QHBoxLayout(this);
@@ -40,20 +40,20 @@ void RuleModelManagerDialog::setData(QVector<AdjudicationRule> *rules, QVector<A
 void RuleModelManagerDialog::setupRulePanel(QWidget *parent)
 {
     auto *layout = new QVBoxLayout(parent);
-    layout->addWidget(new QLabel(tr("裁决规则"), parent));
+    layout->addWidget(new QLabel(QStringLiteral("裁决规则"), parent));
 
     m_ruleTable = new QTableWidget(parent);
     m_ruleTable->setColumnCount(3);
-    m_ruleTable->setHorizontalHeaderLabels({tr("名称"), tr("阈值"), tr("权重")});
+    m_ruleTable->setHorizontalHeaderLabels({QStringLiteral("名称"), QStringLiteral("阈值"), QStringLiteral("权重")});
     m_ruleTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     m_ruleTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_ruleTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     layout->addWidget(m_ruleTable, 1);
 
     auto *buttons = new QHBoxLayout();
-    auto *addBtn = new QPushButton(tr("新增"), parent);
-    auto *editBtn = new QPushButton(tr("编辑"), parent);
-    auto *removeBtn = new QPushButton(tr("删除"), parent);
+    auto *addBtn = new QPushButton(QStringLiteral("新增"), parent);
+    auto *editBtn = new QPushButton(QStringLiteral("编辑"), parent);
+    auto *removeBtn = new QPushButton(QStringLiteral("删除"), parent);
     buttons->addWidget(addBtn);
     buttons->addWidget(editBtn);
     buttons->addWidget(removeBtn);
@@ -68,20 +68,20 @@ void RuleModelManagerDialog::setupRulePanel(QWidget *parent)
 void RuleModelManagerDialog::setupModelPanel(QWidget *parent)
 {
     auto *layout = new QVBoxLayout(parent);
-    layout->addWidget(new QLabel(tr("裁决模型"), parent));
+    layout->addWidget(new QLabel(QStringLiteral("裁决模型"), parent));
 
     m_modelTable = new QTableWidget(parent);
     m_modelTable->setColumnCount(3);
-    m_modelTable->setHorizontalHeaderLabels({tr("名称"), tr("环境因子"), tr("环境权重")});
+    m_modelTable->setHorizontalHeaderLabels({QStringLiteral("名称"), QStringLiteral("环境因子"), QStringLiteral("环境权重")});
     m_modelTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     m_modelTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_modelTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     layout->addWidget(m_modelTable, 1);
 
     auto *buttons = new QHBoxLayout();
-    auto *addBtn = new QPushButton(tr("新增"), parent);
-    auto *editBtn = new QPushButton(tr("编辑"), parent);
-    auto *removeBtn = new QPushButton(tr("删除"), parent);
+    auto *addBtn = new QPushButton(QStringLiteral("新增"), parent);
+    auto *editBtn = new QPushButton(QStringLiteral("编辑"), parent);
+    auto *removeBtn = new QPushButton(QStringLiteral("删除"), parent);
     buttons->addWidget(addBtn);
     buttons->addWidget(editBtn);
     buttons->addWidget(removeBtn);
@@ -134,7 +134,7 @@ void RuleModelManagerDialog::addRule()
         return;
 
     AdjudicationRule rule;
-    rule.name = tr("规则%1").arg(m_rules->size() + 1);
+    rule.name = QStringLiteral("规则%1").arg(m_rules->size() + 1);
     if (editRule(rule, true))
     {
         m_rules->append(rule);
@@ -174,7 +174,7 @@ void RuleModelManagerDialog::addModel()
     if (!m_models)
         return;
     AdjudicationModel model;
-    model.name = tr("模型%1").arg(m_models->size() + 1);
+    model.name = QStringLiteral("模型%1").arg(m_models->size() + 1);
     if (editModel(model, true))
     {
         m_models->append(model);
@@ -212,16 +212,16 @@ void RuleModelManagerDialog::removeSelectedModel()
 bool RuleModelManagerDialog::editRule(AdjudicationRule &rule, bool isNew)
 {
     QDialog dialog(this);
-    dialog.setWindowTitle(isNew ? tr("新增规则") : tr("编辑规则"));
+    dialog.setWindowTitle(isNew ? QStringLiteral("新增规则") : QStringLiteral("编辑规则"));
     auto *layout = new QFormLayout(&dialog);
 
     auto *nameEdit = new QLineEdit(rule.name, &dialog);
-    layout->addRow(tr("名称"), nameEdit);
+    layout->addRow(QStringLiteral("名称"), nameEdit);
 
     auto *thresholdSpin = new QSpinBox(&dialog);
     thresholdSpin->setRange(0, 1000);
     thresholdSpin->setValue(rule.successThreshold);
-    layout->addRow(tr("成功阈值"), thresholdSpin);
+    layout->addRow(QStringLiteral("成功阈值"), thresholdSpin);
 
     auto *weightEdit = new QLineEdit(&dialog);
     QStringList weightParts;
@@ -229,9 +229,9 @@ bool RuleModelManagerDialog::editRule(AdjudicationRule &rule, bool isNew)
     {
         weightParts << QStringLiteral("%1:%2").arg(it.key()).arg(it.value());
     }
-    weightEdit->setPlaceholderText(tr("格式: fire:20,hit:30"));
+    weightEdit->setPlaceholderText(QStringLiteral("格式: fire:20,hit:30"));
     weightEdit->setText(weightParts.join(QLatin1Char(',')));
-    layout->addRow(tr("行为权重"), weightEdit);
+    layout->addRow(QStringLiteral("行为权重"), weightEdit);
 
     auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
     layout->addRow(buttons);
@@ -260,21 +260,21 @@ bool RuleModelManagerDialog::editRule(AdjudicationRule &rule, bool isNew)
 bool RuleModelManagerDialog::editModel(AdjudicationModel &model, bool isNew)
 {
     QDialog dialog(this);
-    dialog.setWindowTitle(isNew ? tr("新增模型") : tr("编辑模型"));
+    dialog.setWindowTitle(isNew ? QStringLiteral("新增模型") : QStringLiteral("编辑模型"));
     auto *layout = new QFormLayout(&dialog);
 
     auto *nameEdit = new QLineEdit(model.name, &dialog);
-    layout->addRow(tr("名称"), nameEdit);
+    layout->addRow(QStringLiteral("名称"), nameEdit);
 
     auto *factorsEdit = new QLineEdit(model.factorKeys.join(QLatin1Char(',')), &dialog);
-    factorsEdit->setPlaceholderText(tr("例如: oceanDepth,airDryness"));
-    layout->addRow(tr("环境因子"), factorsEdit);
+    factorsEdit->setPlaceholderText(QStringLiteral("例如: oceanDepth,airDryness"));
+    layout->addRow(QStringLiteral("环境因子"), factorsEdit);
 
     auto *weightSpin = new QDoubleSpinBox(&dialog);
     weightSpin->setRange(0.0, 1.0);
     weightSpin->setSingleStep(0.05);
     weightSpin->setValue(model.environmentWeight);
-    layout->addRow(tr("环境权重"), weightSpin);
+    layout->addRow(QStringLiteral("环境权重"), weightSpin);
 
     auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
     layout->addRow(buttons);

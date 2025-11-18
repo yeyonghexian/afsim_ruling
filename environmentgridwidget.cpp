@@ -1,4 +1,4 @@
-#include "environmentgridwidget.h"
+﻿#include "environmentgridwidget.h"
 
 #include <QPainter>
 #include <QMouseEvent>
@@ -116,7 +116,7 @@ void EnvironmentGridWidget::mouseDoubleClickEvent(QMouseEvent *event)
     }
 
     EnvironmentFactors factors = factorsAt(cell);
-    if (editFactors(tr("设置环境因子 (%1, %2)").arg(cell.x()).arg(cell.y()), factors))
+    if (editFactors(QStringLiteral("设置环境因子 (%1, %2)").arg(cell.x()).arg(cell.y()), factors))
     {
         setFactorsAt(cell, factors);
     }
@@ -167,11 +167,11 @@ bool EnvironmentGridWidget::editFactors(QString title, EnvironmentFactors &facto
         return box;
     };
 
-    QSpinBox *ocean = spin(tr("海洋深度"), factors.oceanDepth);
-    QSpinBox *air = spin(tr("空气干燥度"), factors.airDryness);
-    QSpinBox *em = spin(tr("电磁干扰系数"), factors.emInterference);
-    QSpinBox *temp = spin(tr("气温"), factors.temperature);
-    QSpinBox *hum = spin(tr("湿度"), factors.humidity);
+    QSpinBox *ocean = spin(QStringLiteral("海洋深度"), factors.oceanDepth);
+    QSpinBox *air = spin(QStringLiteral("空气干燥度"), factors.airDryness);
+    QSpinBox *em = spin(QStringLiteral("电磁干扰系数"), factors.emInterference);
+    QSpinBox *temp = spin(QStringLiteral("气温"), factors.temperature);
+    QSpinBox *hum = spin(QStringLiteral("湿度"), factors.humidity);
 
     auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
     layout->addRow(buttons);

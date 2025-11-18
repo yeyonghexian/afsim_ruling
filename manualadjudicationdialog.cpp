@@ -8,17 +8,17 @@
 ManualAdjudicationDialog::ManualAdjudicationDialog(QWidget *parent)
     : QDialog(parent)
 {
-    setWindowTitle(tr("人工裁决"));
+    setWindowTitle(QStringLiteral("人工裁决"));
     auto *layout = new QVBoxLayout(this);
 
     m_hintLabel = new QLabel(this);
     m_hintLabel->setWordWrap(true);
     layout->addWidget(m_hintLabel);
 
-    m_fireAllowedCheck = new QCheckBox("允许开火", this);
-    m_fireHitCheck = new QCheckBox("命中目标", this);
-    m_detectionCheck = new QCheckBox("探测成功", this);
-    m_jamCheck = new QCheckBox("电磁干扰成功", this);
+    m_fireAllowedCheck = new QCheckBox(QStringLiteral("允许开火"), this);
+    m_fireHitCheck = new QCheckBox(QStringLiteral("命中目标"), this);
+    m_detectionCheck = new QCheckBox(QStringLiteral("探测成功"), this);
+    m_jamCheck = new QCheckBox(QStringLiteral("电磁干扰成功"), this);
 
     layout->addWidget(m_fireAllowedCheck);
     layout->addWidget(m_fireHitCheck);
@@ -36,23 +36,23 @@ void ManualAdjudicationDialog::setContext(const QString &title, const Task &task
     setWindowTitle(title);
 
     QStringList summary;
-    summary << tr("任务: %1").arg(task.name);
-    summary << tr("时间: %1 s").arg(task.executionTime);
-    summary << tr("目标: (%1, %2)").arg(task.targetCell.x()).arg(task.targetCell.y());
+    summary << QStringLiteral("任务: %1").arg(task.name);
+    summary << QStringLiteral("时间: %1 s").arg(task.executionTime);
+    summary << QStringLiteral("目标: (%1, %2)").arg(task.targetCell.x()).arg(task.targetCell.y());
 
     QStringList requirements;
     if (task.requiresFire)
-        requirements << tr("开火");
+        requirements << QStringLiteral("开火");
     if (task.requiresHit)
-        requirements << tr("命中");
+        requirements << QStringLiteral("命中");
     if (task.requiresDetection)
-        requirements << tr("探测");
+        requirements << QStringLiteral("探测");
     if (task.requiresJam)
-        requirements << tr("电磁干扰");
+        requirements << QStringLiteral("电磁干扰");
 
     if (!requirements.isEmpty())
     {
-        summary << tr("裁决环节: %1").arg(requirements.join(QLatin1Char(',')));
+        summary << QStringLiteral("裁决环节: %1").arg(requirements.join(QLatin1Char(',')));
     }
 
     m_hintLabel->setText(summary.join(QStringLiteral("\n")));

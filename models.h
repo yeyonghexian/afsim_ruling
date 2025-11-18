@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QString>
 #include <QVector>
@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QStringList>
 #include <QtGlobal>
+#include <QStringLiteral>
 
 enum class TaskEvent
 {
@@ -54,11 +55,11 @@ struct Task
         switch (status)
         {
         case TaskStatus::Pending:
-            return QStringLiteral("等待 %1s").arg(executionTime);
+            return  QStringLiteral("等待 %1s").arg(executionTime);
         case TaskStatus::Success:
-            return QStringLiteral("执行成功");
+            return  QStringLiteral("执行成功");
         case TaskStatus::Failed:
-            return QStringLiteral("执行失败");
+            return  QStringLiteral("执行失败");
         }
         return {};
     }

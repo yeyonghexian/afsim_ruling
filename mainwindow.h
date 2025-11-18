@@ -31,6 +31,8 @@ private slots:
     void advanceSimulation();
     void openTaskManager();
     void openRuleModelManager();
+    void clearLog();
+    void resetSimulation();
 
 private:
     void setupUi();

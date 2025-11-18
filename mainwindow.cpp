@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 
 #include "environmentgridwidget.h"
 #include "manualadjudicationdialog.h"
@@ -26,22 +26,22 @@ QString requirementText(const Task &task)
 {
     QStringList parts;
     if (task.requiresFire)
-        parts << QObject::tr("开火");
+        parts << QStringLiteral("开火");
     if (task.requiresHit)
-        parts << QObject::tr("命中");
+        parts << QStringLiteral("命中");
     if (task.requiresDetection)
-        parts << QObject::tr("探测");
+        parts << QStringLiteral("探测");
     if (task.requiresJam)
-        parts << QObject::tr("电磁干扰");
-    return parts.isEmpty() ? QObject::tr("无") : parts.join(QLatin1Char(','));
+        parts << QStringLiteral("电磁干扰");
+    return parts.isEmpty() ? QStringLiteral("无") : parts.join(QLatin1Char(','));
 }
 }
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    setWindowTitle(tr("裁决控制台"));
-    resize(1280, 800);
+    setWindowTitle(QStringLiteral("裁决控制台"));
+    resize(1600, 900);
 
     m_timer = new QTimer(this);
     connect(m_timer, &QTimer::timeout, this, &MainWindow::advanceSimulation);
@@ -72,13 +72,13 @@ void MainWindow::setupUi()
     leftLayout->setContentsMargins(6, 6, 6, 6);
 
     m_taskTree = new QTreeWidget(leftPanel);
-    m_taskTree->setHeaderLabels({tr("飞机/任务"), tr("状态/时间"), tr("详情")});
+    m_taskTree->setHeaderLabels({QStringLiteral("飞机/任务"), QStringLiteral("状态/时间"), QStringLiteral("详情")});
     m_taskTree->setRootIsDecorated(true);
     leftLayout->addWidget(m_taskTree, 1);
 
     m_logView = new QPlainTextEdit(leftPanel);
     m_logView->setReadOnly(true);
-    m_logView->setPlaceholderText(tr("裁决结果将显示在此"));
+    m_logView->setPlaceholderText(QStringLiteral("裁决结果将显示在此"));
     leftLayout->addWidget(m_logView, 1);
 
     splitter->addWidget(leftPanel);
@@ -86,8 +86,8 @@ void MainWindow::setupUi()
     m_grid = new EnvironmentGridWidget(splitter);
     splitter->addWidget(m_grid);
 
-    splitter->setStretchFactor(0, 1);
-    splitter->setStretchFactor(1, 2);
+    splitter->setStretchFactor(0, 2);
+    splitter->setStretchFactor(1, 3);
 
     centralLayout->addWidget(splitter);
     setCentralWidget(central);
@@ -98,47 +98,56 @@ void MainWindow::setupUi()
 
 void MainWindow::setupToolBar()
 {
-    auto *toolbar = addToolBar(tr("控制"));
+    auto *toolbar = addToolBar(QStringLiteral("控制"));
     toolbar->setMovable(false);
 
-    toolbar->addWidget(new QLabel(tr("模式:"), toolbar));
+    toolbar->addWidget(new QLabel(QStringLiteral("模式:"), toolbar));
     m_modeCombo = new QComboBox(toolbar);
-    m_modeCombo->addItem(tr("自动裁决"));
-    m_modeCombo->addItem(tr("人工裁决"));
+    m_modeCombo->addItem(QStringLiteral("自动裁决"));
+    m_modeCombo->addItem(QStringLiteral("人工裁决"));
     connect(m_modeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onModeChanged);
     toolbar->addWidget(m_modeCombo);
 
     toolbar->addSeparator();
-    toolbar->addWidget(new QLabel(tr("裁决规则:"), toolbar));
+    toolbar->addWidget(new QLabel(QStringLiteral("裁决规则:"), toolbar));
     m_ruleCombo = new QComboBox(toolbar);
     connect(m_ruleCombo, &QComboBox::currentTextChanged, this, &MainWindow::onRuleChanged);
     toolbar->addWidget(m_ruleCombo);
 
-    toolbar->addWidget(new QLabel(tr("裁决模型:"), toolbar));
+    toolbar->addWidget(new QLabel(QStringLiteral("裁决模型:"), toolbar));
     m_modelCombo = new QComboBox(toolbar);
     connect(m_modelCombo, &QComboBox::currentTextChanged, this, &MainWindow::onModelChanged);
     toolbar->addWidget(m_modelCombo);
 
     toolbar->addSeparator();
-    m_startButton = new QPushButton(tr("开始"), toolbar);
+    m_startButton = new QPushButton(QStringLiteral("开始"), toolbar);
     connect(m_startButton, &QPushButton::clicked, this, &MainWindow::startSimulation);
     toolbar->addWidget(m_startButton);
 
-    m_pauseButton = new QPushButton(tr("暂停"), toolbar);
+    m_pauseButton = new QPushButton(QStringLiteral("暂停"), toolbar);
     connect(m_pauseButton, &QPushButton::clicked, this, &MainWindow::pauseSimulation);
     toolbar->addWidget(m_pauseButton);
 
     toolbar->addSeparator();
-    auto *taskAction = toolbar->addAction(tr("任务管理"));
+    auto *taskAction = toolbar->addAction(QStringLiteral("任务管理"));
     connect(taskAction, &QAction::triggered, this, &MainWindow::openTaskManager);
 
-    auto *ruleAction = toolbar->addAction(tr("规则/模型管理"));
+    auto *ruleAction = toolbar->addAction(QStringLiteral("规则/模型管理"));
     connect(ruleAction, &QAction::triggered, this, &MainWindow::openRuleModelManager);
+
+    toolbar->addSeparator();
+    auto *clearLogBtn = new QPushButton(QStringLiteral("清除日志"), toolbar);
+    connect(clearLogBtn, &QPushButton::clicked, this, &MainWindow::clearLog);
+    toolbar->addWidget(clearLogBtn);
+
+    auto *resetBtn = new QPushButton(QStringLiteral("重新开始"), toolbar);
+    connect(resetBtn, &QPushButton::clicked, this, &MainWindow::resetSimulation);
+    toolbar->addWidget(resetBtn);
 }
 
 void MainWindow::setupStatusBar()
 {
-    m_timeLabel = new QLabel(tr("仿真时间: 0 s"), this);
+    m_timeLabel = new QLabel(QStringLiteral("仿真时间: 0 s"), this);
     statusBar()->addPermanentWidget(m_timeLabel);
 }
 
@@ -249,7 +258,7 @@ void MainWindow::loadSampleData()
     m_state.mode = AdjudicationMode::Automatic;
 
     AdjudicationRule baseRule;
-    baseRule.name = tr("标准规则");
+    baseRule.name = QStringLiteral("标准规则");
     baseRule.successThreshold = 60;
     baseRule.behaviorWeights.insert(QStringLiteral("fire"), 25);
     baseRule.behaviorWeights.insert(QStringLiteral("hit"), 25);
@@ -258,7 +267,7 @@ void MainWindow::loadSampleData()
     m_state.rules.append(baseRule);
 
     AdjudicationRule aggressiveRule;
-    aggressiveRule.name = tr("进攻优先");
+    aggressiveRule.name = QStringLiteral("进攻优先");
     aggressiveRule.successThreshold = 55;
     aggressiveRule.behaviorWeights.insert(QStringLiteral("fire"), 30);
     aggressiveRule.behaviorWeights.insert(QStringLiteral("hit"), 30);
@@ -267,14 +276,14 @@ void MainWindow::loadSampleData()
     m_state.rules.append(aggressiveRule);
 
     AdjudicationModel envModel;
-    envModel.name = tr("环境优先模型");
-    envModel.factorKeys = {QStringLiteral("oceanDepth"), QStringLiteral("airDryness"), QStringLiteral("emInterference")};
+    envModel.name = QStringLiteral("环境优先模型");
+    envModel.factorKeys = QStringList{QStringLiteral("oceanDepth"), QStringLiteral("airDryness"), QStringLiteral("emInterference")};
     envModel.environmentWeight = 0.8;
     m_state.models.append(envModel);
 
     AdjudicationModel balancedModel;
-    balancedModel.name = tr("均衡模型");
-    balancedModel.factorKeys = {QStringLiteral("temperature"), QStringLiteral("humidity")};
+    balancedModel.name = QStringLiteral("均衡模型");
+    balancedModel.factorKeys = QStringList{QStringLiteral("temperature"), QStringLiteral("humidity")};
     balancedModel.environmentWeight = 0.6;
     m_state.models.append(balancedModel);
 
@@ -282,12 +291,12 @@ void MainWindow::loadSampleData()
     m_state.currentModelName = envModel.name;
 
     Aircraft red;
-    red.name = tr("红方-1");
+    red.name = QStringLiteral("红方-1");
     red.route = {QPoint(2, 2), QPoint(10, 5), QPoint(20, 15), QPoint(30, 25), QPoint(40, 35)};
     red.secondsPerStep = 1.5;
 
     Task patrol;
-    patrol.name = tr("空域巡逻");
+    patrol.name = QStringLiteral("空域巡逻");
     patrol.executionTime = 3;
     patrol.requiresDetection = true;
     patrol.targetCell = QPoint(10, 5);
@@ -295,7 +304,7 @@ void MainWindow::loadSampleData()
     red.tasks.append(patrol);
 
     Task strike;
-    strike.name = tr("远程打击");
+    strike.name = QStringLiteral("远程打击");
     strike.executionTime = 8;
     strike.requiresFire = true;
     strike.requiresHit = true;
@@ -305,12 +314,12 @@ void MainWindow::loadSampleData()
     red.tasks.append(strike);
 
     Aircraft blue;
-    blue.name = tr("蓝方-1");
+    blue.name = QStringLiteral("蓝方-1");
     blue.route = {QPoint(48, 10), QPoint(40, 12), QPoint(32, 20), QPoint(20, 30), QPoint(5, 40)};
     blue.secondsPerStep = 1.2;
 
     Task recon;
-    recon.name = tr("光电侦察");
+    recon.name = QStringLiteral("光电侦察");
     recon.executionTime = 5;
     recon.requiresDetection = true;
     recon.targetCell = QPoint(32, 20);
@@ -318,7 +327,7 @@ void MainWindow::loadSampleData()
     blue.tasks.append(recon);
 
     Task support;
-    support.name = tr("干扰支援");
+    support.name = QStringLiteral("干扰支援");
     support.executionTime = 9;
     support.requiresJam = true;
     support.targetCell = QPoint(20, 30);
@@ -344,15 +353,15 @@ void MainWindow::refreshAircraftTree()
     {
         auto *aircraftItem = new QTreeWidgetItem(m_taskTree);
         aircraftItem->setText(0, ac.name);
-        aircraftItem->setText(1, tr("速度 %1s/格").arg(ac.secondsPerStep, 0, 'f', 1));
-        aircraftItem->setText(2, tr("航迹点 %1").arg(ac.route.size()));
+        aircraftItem->setText(1, QStringLiteral("速度 %1s/格").arg(ac.secondsPerStep, 0, 'f', 1));
+        aircraftItem->setText(2, QStringLiteral("航迹点 %1").arg(ac.route.size()));
 
         for (const Task &task : ac.tasks)
         {
             auto *taskItem = new QTreeWidgetItem(aircraftItem);
             taskItem->setText(0, QStringLiteral("- %1").arg(task.name));
             taskItem->setText(1, task.statusText());
-            taskItem->setText(2, tr("目标(%1,%2) | %3").arg(task.targetCell.x()).arg(task.targetCell.y()).arg(requirementText(task)));
+            taskItem->setText(2, QStringLiteral("目标(%1,%2) | %3").arg(task.targetCell.x()).arg(task.targetCell.y()).arg(requirementText(task)));
             if (task.status == TaskStatus::Success)
             {
                 taskItem->setForeground(1, QBrush(QColor(0, 128, 0)));
@@ -429,9 +438,19 @@ void MainWindow::refreshLogView()
         return;
 
     QStringList lines;
+    QString lastTaskKey;
     for (const TaskLogEntry &entry : m_state.logs)
     {
+        QString currentTaskKey = entry.aircraftName + QLatin1String("::") + entry.taskName;
+        
+        // 如果任务改变，添加空行分隔
+        if (!lastTaskKey.isEmpty() && lastTaskKey != currentTaskKey)
+        {
+            lines << QString();
+        }
+        
         lines << QStringLiteral("[%1][%2][%3] %4").arg(entry.timestamp, entry.aircraftName, entry.taskName, entry.message);
+        lastTaskKey = currentTaskKey;
     }
     m_logView->setPlainText(lines.join(QLatin1Char('\n')));
     if (auto *bar = m_logView->verticalScrollBar())
@@ -444,7 +463,7 @@ void MainWindow::updateTimeLabel()
 {
     if (m_timeLabel)
     {
-        m_timeLabel->setText(tr("仿真时间: %1 s").arg(m_state.simulationTime));
+        m_timeLabel->setText(QStringLiteral("仿真时间: %1 s").arg(m_state.simulationTime));
     }
 }
 
@@ -472,7 +491,7 @@ void MainWindow::handleTask(Aircraft &aircraft, Task &task)
     }
     if (!rule)
     {
-        appendLog(aircraft.name, task, tr("未找到可用的裁决规则"));
+        appendLog(aircraft.name, task, QStringLiteral("未找到可用的裁决规则"));
         task.status = TaskStatus::Failed;
         return;
     }
@@ -484,7 +503,7 @@ void MainWindow::handleTask(Aircraft &aircraft, Task &task)
     }
     if (!model)
     {
-        appendLog(aircraft.name, task, tr("未找到可用的裁决模型"));
+        appendLog(aircraft.name, task, QStringLiteral("未找到可用的裁决模型"));
         task.status = TaskStatus::Failed;
         return;
     }
@@ -498,14 +517,14 @@ void MainWindow::handleTask(Aircraft &aircraft, Task &task)
             pauseSimulation();
         }
 
-        m_manualDialog->setContext(tr("人工裁决 - %1").arg(task.name), task, manualState);
+        m_manualDialog->setContext(QStringLiteral("人工裁决 - %1").arg(task.name), task, manualState);
         if (m_manualDialog->exec() == QDialog::Accepted)
         {
             manualState = m_manualDialog->state();
         }
         else
         {
-            appendLog(aircraft.name, task, tr("人工裁决被取消，任务失败"));
+            appendLog(aircraft.name, task, QStringLiteral("人工裁决被取消，任务失败"));
             task.status = TaskStatus::Failed;
             if (resumeAfter)
             {
@@ -527,7 +546,7 @@ void MainWindow::handleTask(Aircraft &aircraft, Task &task)
     {
         appendLog(aircraft.name, task, line);
     }
-    appendLog(aircraft.name, task, status == TaskStatus::Success ? tr("任务裁决成功") : tr("任务裁决失败"));
+    appendLog(aircraft.name, task, status == TaskStatus::Success ? QStringLiteral("任务裁决成功") : QStringLiteral("任务裁决失败"));
     refreshLogView();
 }
 
@@ -586,4 +605,45 @@ void MainWindow::appendLog(const QString &aircraftName, const Task &task, const 
     entry.timestamp = QStringLiteral("T+%1s").arg(m_state.simulationTime);
     m_state.logs.append(entry);
     refreshLogView();
+}
+
+void MainWindow::clearLog()
+{
+    m_state.logs.clear();
+    refreshLogView();
+}
+
+void MainWindow::resetSimulation()
+{
+    // 暂停仿真
+    pauseSimulation();
+
+    // 重置仿真时间
+    m_state.simulationTime = 0;
+
+    // 重置所有飞机状态
+    for (Aircraft &aircraft : m_state.aircrafts)
+    {
+        aircraft.currentRouteIndex = 0;
+        aircraft.stepAccumulator = 0.0;
+
+        // 重置所有任务状态为待执行
+        for (Task &task : aircraft.tasks)
+        {
+            task.status = TaskStatus::Pending;
+        }
+    }
+
+    // 清除日志
+    m_state.logs.clear();
+
+    // 刷新所有显示
+    refreshAircraftTree();
+    refreshLogView();
+    updateTimeLabel();
+
+    if (m_grid)
+    {
+        m_grid->update();
+    }
 }

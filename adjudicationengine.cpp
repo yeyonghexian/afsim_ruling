@@ -1,4 +1,4 @@
-#include "adjudicationengine.h"
+﻿#include "adjudicationengine.h"
 
 #include <QtMath>
 
@@ -60,22 +60,26 @@ bool AdjudicationEngine::eventSuccess(TaskEvent event,
     const double manualWeight = 1.0 - model.environmentWeight;
 
     double base = model.environmentWeight * envScore + manualWeight * 0.9; // assume manual factors succeed
+    //判断最终分数 = 环境得分+人为得分 >= 0.5 则通过
+    //环境得分=环境因子/100（累加） * 环境权重
+    //人为得分=0.9 * 人为权重
 
-    switch (event)
-    {
-    case TaskEvent::Fire:
-        base += 0.05;
-        break;
-    case TaskEvent::Hit:
-        base -= 0.05;
-        break;
-    case TaskEvent::Detect:
-        base += 0.02;
-        break;
-    case TaskEvent::Jam:
-        base -= 0.02;
-        break;
-    }
+    //修正
+//    switch (event)
+//    {
+//    case TaskEvent::Fire:
+//        base += 0.05;
+//        break;
+//    case TaskEvent::Hit:
+//        base -= 0.05;
+//        break;
+//    case TaskEvent::Detect:
+//        base += 0.02;
+//        break;
+//    case TaskEvent::Jam:
+//        base -= 0.02;
+//        break;
+//    }
 
     return base >= 0.5;
 }
@@ -106,13 +110,13 @@ TaskStatus AdjudicationEngine::adjudicate(Task &task,
     {
         const bool ok = eventSuccess(TaskEvent::Fire, factors, model, mode, manualState);
         score += ok ? weightFor(rule, QStringLiteral("fire")) : 0;
-        logEvent(ok ? QObject::tr("开火许可通过") : QObject::tr("开火许可被拒"));
+        logEvent(ok ? QStringLiteral("开火许可通过") : QStringLiteral("开火许可被拒"));
 
         if (task.requiresHit)
         {
             const bool hit = ok && eventSuccess(TaskEvent::Hit, factors, model, mode, manualState);
             score += hit ? weightFor(rule, QStringLiteral("hit")) : 0;
-            logEvent(hit ? QObject::tr("命中目标") : QObject::tr("未命中目标"));
+            logEvent(hit ? QStringLiteral("命中目标") : QStringLiteral("未命中目标"));
         }
     }
 
@@ -120,18 +124,18 @@ TaskStatus AdjudicationEngine::adjudicate(Task &task,
     {
         const bool detect = eventSuccess(TaskEvent::Detect, factors, model, mode, manualState);
         score += detect ? weightFor(rule, QStringLiteral("detect")) : 0;
-        logEvent(detect ? QObject::tr("探测成功") : QObject::tr("探测失败"));
+        logEvent(detect ? QStringLiteral("探测成功") : QStringLiteral("探测失败"));
     }
 
     if (task.requiresJam)
     {
         const bool jam = eventSuccess(TaskEvent::Jam, factors, model, mode, manualState);
         score += jam ? weightFor(rule, QStringLiteral("jam")) : 0;
-        logEvent(jam ? QObject::tr("电磁干扰成功") : QObject::tr("电磁干扰失败"));
+        logEvent(jam ? QStringLiteral("电磁干扰成功") : QStringLiteral("电磁干扰失败"));
     }
 
     TaskStatus result = score >= rule.successThreshold ? TaskStatus::Success : TaskStatus::Failed;
-    logEvent(QObject::tr("任务得分 %1 / %2").arg(score).arg(rule.successThreshold));
+    logEvent(QStringLiteral("任务得分 %1 / %2").arg(score).arg(rule.successThreshold));
     task.status = result;
     return result;
 }

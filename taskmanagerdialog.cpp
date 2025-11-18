@@ -1,4 +1,5 @@
-#include "taskmanagerdialog.h"
+﻿#include "taskmanagerdialog.h"
+#include "environmentgridwidget.h"
 
 #include <QComboBox>
 #include <QPlainTextEdit>
@@ -22,13 +23,13 @@ QString taskRequirementText(const Task &task)
 {
     QStringList parts;
     if (task.requiresFire)
-        parts << QObject::tr("开火");
+        parts << QStringLiteral("开火");
     if (task.requiresHit)
-        parts << QObject::tr("命中");
+        parts << QStringLiteral("命中");
     if (task.requiresDetection)
-        parts << QObject::tr("探测");
+        parts << QStringLiteral("探测");
     if (task.requiresJam)
-        parts << QObject::tr("电磁干扰");
+        parts << QStringLiteral("电磁干扰");
     return parts.join(QLatin1Char(','));
 }
 }
@@ -36,13 +37,13 @@ QString taskRequirementText(const Task &task)
 TaskManagerDialog::TaskManagerDialog(QWidget *parent)
     : QDialog(parent)
 {
-    setWindowTitle(tr("任务管理"));
+    setWindowTitle(QStringLiteral("任务管理"));
     resize(720, 520);
 
     auto *mainLayout = new QVBoxLayout(this);
 
     auto *topRow = new QHBoxLayout();
-    topRow->addWidget(new QLabel(tr("飞机:"), this));
+    topRow->addWidget(new QLabel(QStringLiteral("飞机:"), this));
     m_aircraftCombo = new QComboBox(this);
     topRow->addWidget(m_aircraftCombo, 1);
     mainLayout->addLayout(topRow);
@@ -52,22 +53,22 @@ TaskManagerDialog::TaskManagerDialog(QWidget *parent)
     });
 
     auto *routeRow = new QHBoxLayout();
-    auto *routeLabel = new QLabel(tr("航迹 (每行 x,y):"), this);
+    auto *routeLabel = new QLabel(QStringLiteral("航迹 (每行 x,y):"), this);
     routeRow->addWidget(routeLabel);
     m_speedSpin = new QDoubleSpinBox(this);
     m_speedSpin->setRange(0.1, 10.0);
     m_speedSpin->setSingleStep(0.1);
-    m_speedSpin->setSuffix(tr(" s/格"));
-    routeRow->addWidget(new QLabel(tr("速度:"), this));
+    m_speedSpin->setSuffix(QStringLiteral(" s/格"));
+    routeRow->addWidget(new QLabel(QStringLiteral("速度:"), this));
     routeRow->addWidget(m_speedSpin);
     mainLayout->addLayout(routeRow);
 
     m_routeEdit = new QPlainTextEdit(this);
-    m_routeEdit->setPlaceholderText(tr("例如: 0,0\n0,10\n10,10"));
+    m_routeEdit->setPlaceholderText(QStringLiteral("例如: 0,0\n0,10\n10,10"));
     m_routeEdit->setMinimumHeight(120);
     mainLayout->addWidget(m_routeEdit);
 
-    auto *applyRouteBtn = new QPushButton(tr("保存航迹与速度"), this);
+    auto *applyRouteBtn = new QPushButton(QStringLiteral("保存航迹与速度"), this);
     connect(applyRouteBtn, &QPushButton::clicked, this, [this]() {
         applyRouteChanges();
         applySpeedChanges();
@@ -76,16 +77,16 @@ TaskManagerDialog::TaskManagerDialog(QWidget *parent)
 
     m_taskTable = new QTableWidget(this);
     m_taskTable->setColumnCount(6);
-    m_taskTable->setHorizontalHeaderLabels({tr("任务"), tr("执行时间"), tr("目标"), tr("要求"), tr("规则"), tr("状态")});
+    m_taskTable->setHorizontalHeaderLabels({QStringLiteral("任务"), QStringLiteral("执行时间"), QStringLiteral("目标"), QStringLiteral("要求"), QStringLiteral("规则"), QStringLiteral("状态")});
     m_taskTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     m_taskTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_taskTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     mainLayout->addWidget(m_taskTable, 1);
 
     auto *taskButtons = new QHBoxLayout();
-    auto *addBtn = new QPushButton(tr("新增任务"), this);
-    auto *editBtn = new QPushButton(tr("编辑任务"), this);
-    auto *removeBtn = new QPushButton(tr("删除任务"), this);
+    auto *addBtn = new QPushButton(QStringLiteral("新增任务"), this);
+    auto *editBtn = new QPushButton(QStringLiteral("编辑任务"), this);
+    auto *removeBtn = new QPushButton(QStringLiteral("删除任务"), this);
     taskButtons->addWidget(addBtn);
     taskButtons->addWidget(editBtn);
     taskButtons->addWidget(removeBtn);
@@ -198,7 +199,7 @@ void TaskManagerDialog::applyRouteChanges()
         const QStringList parts = line.split(',', Qt::SkipEmptyParts);
         if (parts.size() != 2)
         {
-            QMessageBox::warning(this, tr("格式错误"), tr("航迹行必须为 x,y"));
+            QMessageBox::warning(this, QStringLiteral("格式错误"), QStringLiteral("航迹行必须为 x,y"));
             return;
         }
         bool okX = false;
@@ -207,7 +208,7 @@ void TaskManagerDialog::applyRouteChanges()
         int y = parts.at(1).trimmed().toInt(&okY);
         if (!okX || !okY || x < 0 || x >= EnvironmentGridWidget::GridSize || y < 0 || y >= EnvironmentGridWidget::GridSize)
         {
-            QMessageBox::warning(this, tr("范围错误"), tr("坐标需在 0-%1 之间").arg(EnvironmentGridWidget::GridSize - 1));
+            QMessageBox::warning(this, QStringLiteral("范围错误"), QStringLiteral("坐标需在 0-%1 之间").arg(EnvironmentGridWidget::GridSize - 1));
             return;
         }
         newRoute.append(QPoint(x, y));
@@ -250,7 +251,7 @@ void TaskManagerDialog::addTask()
     }
 
     Task task;
-    task.name = tr("新任务%1").arg(ac->tasks.size() + 1);
+    task.name = QStringLiteral("新任务%1").arg(ac->tasks.size() + 1);
     task.ruleName = !m_ruleNames.isEmpty() ? m_ruleNames.first() : QString();
     if (editTask(task, true))
     {
@@ -306,16 +307,16 @@ void TaskManagerDialog::removeSelectedTask()
 bool TaskManagerDialog::editTask(Task &task, bool isNew)
 {
     QDialog dialog(this);
-    dialog.setWindowTitle(isNew ? tr("新增任务") : tr("编辑任务"));
+    dialog.setWindowTitle(isNew ? QStringLiteral("新增任务") : QStringLiteral("编辑任务"));
     auto *layout = new QFormLayout(&dialog);
 
     auto *nameEdit = new QLineEdit(task.name, &dialog);
-    layout->addRow(tr("名称"), nameEdit);
+    layout->addRow(QStringLiteral("名称"), nameEdit);
 
     auto *timeSpin = new QSpinBox(&dialog);
     timeSpin->setRange(0, 3600);
     timeSpin->setValue(task.executionTime);
-    layout->addRow(tr("执行时间(s)"), timeSpin);
+    layout->addRow(QStringLiteral("执行时间(s)"), timeSpin);
 
     auto *targetRow = new QWidget(&dialog);
     auto *targetLayout = new QHBoxLayout(targetRow);
@@ -330,15 +331,15 @@ bool TaskManagerDialog::editTask(Task &task, bool isNew)
     targetLayout->addWidget(xSpin);
     targetLayout->addWidget(new QLabel("Y", &dialog));
     targetLayout->addWidget(ySpin);
-    layout->addRow(tr("目标格"), targetRow);
+    layout->addRow(QStringLiteral("目标格"), targetRow);
 
-    auto *fireCheck = new QCheckBox(tr("需要开火"), &dialog);
+    auto *fireCheck = new QCheckBox(QStringLiteral("需要开火"), &dialog);
     fireCheck->setChecked(task.requiresFire);
-    auto *hitCheck = new QCheckBox(tr("需要命中"), &dialog);
+    auto *hitCheck = new QCheckBox(QStringLiteral("需要命中"), &dialog);
     hitCheck->setChecked(task.requiresHit);
-    auto *detectCheck = new QCheckBox(tr("需要探测"), &dialog);
+    auto *detectCheck = new QCheckBox(QStringLiteral("需要探测"), &dialog);
     detectCheck->setChecked(task.requiresDetection);
-    auto *jamCheck = new QCheckBox(tr("需要电磁干扰"), &dialog);
+    auto *jamCheck = new QCheckBox(QStringLiteral("需要电磁干扰"), &dialog);
     jamCheck->setChecked(task.requiresJam);
 
     layout->addRow(fireCheck);
@@ -353,7 +354,7 @@ bool TaskManagerDialog::editTask(Task &task, bool isNew)
     {
         ruleCombo->setCurrentIndex(ruleIndex);
     }
-    layout->addRow(tr("裁决规则"), ruleCombo);
+    layout->addRow(QStringLiteral("裁决规则"), ruleCombo);
 
     auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
     layout->addRow(buttons);
